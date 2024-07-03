@@ -46,7 +46,7 @@ def calculate():
     if not has_base_info:
         total_cost *= 2  # Double the cost if base information is not available
 
-    response = {'total_cost': total_cost}
+    response = {"$"'total_cost': total_cost}
     return jsonify(response)
 
 if __name__ == '__main__':

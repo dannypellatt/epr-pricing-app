@@ -1,7 +1,7 @@
-// src/components/PricingForm.js
 import React, { useState } from 'react';
 import axios from 'axios';
-import { TextField, Button, MenuItem, Checkbox, FormControlLabel } from '@mui/material';
+import { TextField, Button, MenuItem, Checkbox, FormControlLabel, Card } from '@mui/material';
+import Grid from '@mui/material/Unstable_Grid2'; 
 
 const PricingForm = () => {
   const [numItems, setNumItems] = useState('');
@@ -26,38 +26,38 @@ const PricingForm = () => {
   
   return (
     <form onSubmit={handleSubmit}>
-  <TextField
-    label="Number of Items"
-    type="number"
-    value={numItems}
-    onChange={(e) => setNumItems(e.target.value)}
-    required
-  />
-  <TextField
-    select
-    label="Difficulty"
-    value={difficulty}
-    onChange={(e) => setDifficulty(e.target.value)}
-    required
-  >
-    <MenuItem value="easy">Easy</MenuItem>
-    <MenuItem value="medium">Medium</MenuItem>
-    <MenuItem value="hard">Hard</MenuItem>
-  </TextField>
-  <FormControlLabel
-    control={
-      <Checkbox
-        checked={hasBaseInfo}
-        onChange={(e) => setHasBaseInfo(e.target.checked)}
-      />
-    }
-    label="Has Base Information"
-  />
-  <Button type="submit" variant="contained" color="primary">
-    Calculate
-  </Button>
-  {totalCost !== null && <div>Total Cost: {totalCost}</div>}
-</form>
+        <TextField
+            label="Number of Items"
+            type="number"
+            value={numItems}
+            onChange={(e) => setNumItems(e.target.value)}
+            required
+        />
+        <TextField
+            select
+            label="Difficulty"
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value)}
+            required
+        >
+            <MenuItem value="easy">Easy</MenuItem>
+            <MenuItem value="medium">Medium</MenuItem>
+            <MenuItem value="hard">Hard</MenuItem>
+        </TextField>
+        <FormControlLabel
+            control={
+            <Checkbox
+                checked={hasBaseInfo}
+                onChange={(e) => setHasBaseInfo(e.target.checked)}
+            />
+            }
+            label="Has Base Information"
+        />
+        <Button type="submit" variant="contained" color="primary">
+            Calculate
+        </Button>
+        {totalCost !== null && <div>Total Cost: {totalCost}</div>}
+        </form>
 
   );
 };
