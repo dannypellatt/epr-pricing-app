@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { TextField, Button, MenuItem, Checkbox, FormControlLabel, Card, Typography, Paper } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2'; 
+import { TextField, Button, MenuItem, Checkbox, FormControlLabel, Typography, Paper, Grid } from '@mui/material';
 
 const PricingForm = () => {
   const [numItems, setNumItems] = useState('');
@@ -11,23 +10,31 @@ const PricingForm = () => {
   const [verificationTime, setVerificationTime] = useState(null);
   const [costPerItem, setCostPerItem] = useState(null);
   const [predictedPasses, setPredictedPasses] = useState(null);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();  // Prevent the default form submission
+    if (numItems > 150000) {
+      setError('Please enter a number less than or equal to 150,000.');
+      return;
+    } else {
+      setError('');
+    }
+
     try {
-        const response = await axios.post('http://127.0.0.1:5000/calculate', {
-          numItems,
-          difficulty,
-          hasBaseInfo,
-        });
-        console.log('Response received:', response.data);
-        setTotalCost(response.data.total_cost);
-        setVerificationTime(response.data.verification_time);
-        setCostPerItem(response.data.cost_per_item);
-        setPredictedPasses(response.data.predicted_passes);
-      } catch (error) {
-        console.error('Error calculating cost:', error);
-      }
+      const response = await axios.post('http://127.0.0.1:5000/calculate', {
+        numItems,
+        difficulty,
+        hasBaseInfo,
+      });
+      console.log('Response received:', response.data);
+      setTotalCost(response.data.total_cost);
+      setVerificationTime(response.data.verification_time);
+      setCostPerItem(response.data.cost_per_item);
+      setPredictedPasses(response.data.predicted_passes);
+    } catch (error) {
+      console.error('Error calculating cost:', error);
+    }
   };
   
   const formatCurrency = (amount) => {
@@ -53,6 +60,8 @@ const PricingForm = () => {
             onChange={(e) => setNumItems(e.target.value)}
             required
             fullWidth
+            error={!!error}
+            helperText={error}
           />
         </Grid>
         <Grid item xs={12} md={6}>
@@ -100,7 +109,7 @@ const PricingForm = () => {
                 Verification Time: {formatHours(verificationTime)}
               </Typography>
               <Typography variant="body1">
-                Cost per Item Scraped: {formatPreciseCurrency(costPerItem)}
+                Cost per Item Scraped: {costPerItem !== null ? formatPreciseCurrency(costPerItem) : '$0.0000'}
               </Typography>
               <Typography variant="body1">
                 Predicted Passes: {predictedPasses}
