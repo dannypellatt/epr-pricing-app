@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { TextField, Button, MenuItem, Checkbox, FormControlLabel, Card, Typography } from '@mui/material';
+import { TextField, Button, MenuItem, Checkbox, FormControlLabel, Card, Typography, Paper } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2'; 
 
 const PricingForm = () => {
@@ -8,6 +8,9 @@ const PricingForm = () => {
   const [difficulty, setDifficulty] = useState('easy');
   const [hasBaseInfo, setHasBaseInfo] = useState(false);
   const [totalCost, setTotalCost] = useState(null);
+  const [verificationTime, setVerificationTime] = useState(null);
+  const [costPerItem, setCostPerItem] = useState(null);
+  const [predictedPasses, setPredictedPasses] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();  // Prevent the default form submission
@@ -19,6 +22,9 @@ const PricingForm = () => {
         });
         console.log('Response received:', response.data);
         setTotalCost(response.data.total_cost);
+        setVerificationTime(response.data.verification_time);
+        setCostPerItem(response.data.cost_per_item);
+        setPredictedPasses(response.data.predicted_passes);
       } catch (error) {
         console.error('Error calculating cost:', error);
       }
@@ -26,6 +32,14 @@ const PricingForm = () => {
   
   const formatCurrency = (amount) => {
     return `$${amount.toFixed(2)}`;
+  };
+
+  const formatPreciseCurrency = (amount) => {
+    return `$${amount.toFixed(4)}`;
+  };
+
+  const formatHours = (hours) => {
+    return `${hours.toFixed(2)} hours`;
   };
 
   return (
@@ -76,6 +90,24 @@ const PricingForm = () => {
             Total Cost: {totalCost !== null ? formatCurrency(totalCost) : '$0.00'}
           </Typography>
         </Grid>
+        {totalCost !== null && (
+          <Grid item xs={12}>
+            <Paper elevation={3} style={{ padding: '20px' }}>
+              <Typography variant="h6">
+                Breakdown:
+              </Typography>
+              <Typography variant="body1">
+                Verification Time: {formatHours(verificationTime)}
+              </Typography>
+              <Typography variant="body1">
+                Cost per Item Scraped: {formatPreciseCurrency(costPerItem)}
+              </Typography>
+              <Typography variant="body1">
+                Predicted Passes: {predictedPasses}
+              </Typography>
+            </Paper>
+          </Grid>
+        )}
       </Grid>     
     </form>
   );

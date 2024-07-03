@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import math
 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000"])
@@ -21,13 +22,13 @@ def calculate():
     # These are the ranges on Clay. Last checked: 7/3/24.
     cost_ranges = [
         (2000, 149.00 / 2000),
-        (3000, 149.00 / 3000),
+        (3000, 229.00 / 3000),
         (10000, 349.00 / 10000),
         (14000, 499.00 / 14000),
         (20000, 699.00 / 20000),
         (50000, 800.00 / 50000),
         (70000, 1000.00 / 70000),
-        (10000, 1500.00 / 100000),
+        (100000, 1500.00 / 100000),
         (150000, 2000.00 / 150000)
     ]
 
@@ -46,7 +47,24 @@ def calculate():
     if not has_base_info:
         total_cost *= 2  # Double the cost if base information is not available
 
-    response = {"$"'total_cost': total_cost}
+    # Calculate verification cost
+    verification_sample_size = math.ceil(num_items * 0.05)
+    verification_time_per_item = {
+        'easy': 0.5,
+        'medium': 1.5,
+        'hard': 4
+    }
+    verification_time = verification_sample_size * verification_time_per_item[difficulty] / 60  # Convert minutes to hours
+    verification_cost = verification_time * 30  # $30 per hour
+
+    total_cost += verification_cost
+
+    response = {
+        'total_cost': total_cost,
+        'verification_time': verification_time,
+        'cost_per_item': base_cost_per_scrape,
+        'predicted_passes': difficulty_multipliers[difficulty]
+    }
     return jsonify(response)
 
 if __name__ == '__main__':
