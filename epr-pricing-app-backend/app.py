@@ -43,6 +43,8 @@ def calculate():
     multiplier = difficulty_multipliers[difficulty]
     total_cost = num_items * base_cost_per_scrape * multiplier
 
+    if not has_base_info:
+        total_cost *= 2  # Double the cost if base information is not available
 
     response = {'total_cost': total_cost}
     return jsonify(response)
