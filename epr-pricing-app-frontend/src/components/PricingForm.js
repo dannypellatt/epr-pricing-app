@@ -10,10 +10,48 @@ const PricingForm = () => {
   const [verificationTime, setVerificationTime] = useState(null);
   const [costPerItem, setCostPerItem] = useState(null);
   const [predictedPasses, setPredictedPasses] = useState(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState({ numItems: '', difficulty: '', hasBaseInfo: '' });
+
+  // Checks if number is over 0 and under 150,000 (the current Clay known limit)
+  const validateNumItems = (value) => {
+    if (!value || isNaN(value) || value <= 0) {
+      return 'Please enter a positive number.';
+    }
+    // CHANGE IF NECESSARY
+    if (value > 150000) {
+      return 'Please enter a number less than or equal to 150,000.';
+    }
+    return '';
+  };
+
+  // Validates as user types
+  const handleNumItemsChange = (e) => {
+    const value = e.target.value;
+    setNumItems(value);
+    setError((prevError) => ({ ...prevError, numItems: validateNumItems(value) }));
+  };
+
+  // Updates changes and removes error messages that may be present.
+  const handleDifficultyChange = (e) => {
+    const value = e.target.value;
+    setDifficulty(value);
+    setError((prevError) => ({ ...prevError, difficulty: '' }));
+  };
+  const handleHasBaseInfoChange = (e) => {
+    const value = e.target.checked;
+    setHasBaseInfo(value);
+    setError((prevError) => ({ ...prevError, hasBaseInfo: '' }));
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();  
+    e.preventDefault();
+    const numItemsError = validateNumItems(numItems);
+
+    if (numItemsError) {
+      setError({ numItems: numItemsError, difficulty: '', hasBaseInfo: '' });
+      return;
+    }
+
     try {
       const response = await axios.post('http://127.0.0.1:5000/calculate', {
         numItems: parseInt(numItems, 10),
@@ -25,12 +63,12 @@ const PricingForm = () => {
       setVerificationTime(response.data.verification_time);
       setCostPerItem(response.data.cost_per_item);
       setPredictedPasses(response.data.predicted_passes);
-      setError('');
+      setError({ numItems: '', difficulty: '', hasBaseInfo: '' });
     } catch (error) {
       if (error.response && error.response.data && error.response.data.error) {
-        setError(error.response.data.error);
+        setError((prevError) => ({ ...prevError, form: error.response.data.error }));
       } else {
-        setError('An error occurred while calculating the cost.');
+        setError((prevError) => ({ ...prevError, form: 'An error occurred while calculating the cost.' }));
       }
     }
   };
@@ -55,11 +93,11 @@ const PricingForm = () => {
             label="Number of Items"
             type="number"
             value={numItems}
-            onChange={(e) => setNumItems(e.target.value)}
+            onChange={handleNumItemsChange}
             required
             fullWidth
-            error={!!error}
-            helperText={error}
+            error={!!error.numItems}
+            helperText={error.numItems}
           />
         </Grid>
         <Grid item xs={12} md={6}>
@@ -67,9 +105,11 @@ const PricingForm = () => {
             select
             label="Difficulty"
             value={difficulty}
-            onChange={(e) => setDifficulty(e.target.value)}
+            onChange={handleDifficultyChange}
             required
             fullWidth
+            error={!!error.difficulty}
+            helperText={error.difficulty}
           >
             <MenuItem value="easy">Easy</MenuItem>
             <MenuItem value="medium">Medium</MenuItem>
@@ -81,7 +121,7 @@ const PricingForm = () => {
             control={
               <Checkbox
                 checked={hasBaseInfo}
-                onChange={(e) => setHasBaseInfo(e.target.checked)}
+                onChange={handleHasBaseInfoChange}
               />
             }
             label="Has Base Information"
@@ -92,6 +132,13 @@ const PricingForm = () => {
             Calculate
           </Button>
         </Grid>
+        {error.form && (
+          <Grid item xs={12}>
+            <Typography color="error">
+              {error.form}
+            </Typography>
+          </Grid>
+        )}
         <Grid item xs={12}>
           <Typography variant="h6">
             Total Cost: {totalCost !== null ? formatCurrency(totalCost) : '$0.00'}
