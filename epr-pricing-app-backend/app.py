@@ -12,7 +12,21 @@ def calculate():
     difficulty = data['difficulty']
     has_base_info = data['hasBaseInfo']
 
-    # These are difficulty multipliers.
+    # Validation (server side)
+    if not num_items or not isinstance(num_items, int) or num_items <= 0:
+        return jsonify({'error': 'Invalid number of items. Please enter a positive number.'}), 400
+
+    if num_items > 150000:
+        return jsonify({'error': 'Number of items exceeds the limit of 150,000.'}), 400
+
+    if difficulty not in ['easy', 'medium', 'hard']:
+        return jsonify({'error': 'Invalid difficulty level. Please select from easy, medium, or hard.'}), 400
+
+    if not isinstance(has_base_info, bool):
+        return jsonify({'error': 'Invalid value for base information. Must be true or false.'}), 400
+
+
+    # Difficulty multipliers.
     difficulty_multipliers = {
         'easy': 1,
         'medium': 3,
@@ -44,8 +58,9 @@ def calculate():
     multiplier = difficulty_multipliers[difficulty]
     total_cost = num_items * base_cost_per_scrape * multiplier
 
+    # Double the cost if base information isn't available
     if not has_base_info:
-        total_cost *= 2  # Double the cost if base information is not available
+        total_cost *= 2  
 
     # Calculate verification cost
     verification_sample_size = math.ceil(num_items * 0.05)

@@ -38,6 +38,7 @@ const App = () => {
             <Typography variant="h5" component="h2" gutterBottom>
               Calculator
             </Typography>
+            <br></br>
             <PricingForm />
           </Paper>
         </Grid>

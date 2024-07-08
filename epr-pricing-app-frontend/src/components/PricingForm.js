@@ -13,17 +13,10 @@ const PricingForm = () => {
   const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
-    e.preventDefault();  // Prevent the default form submission
-    if (numItems > 150000) {
-      setError('Please enter a number less than or equal to 150,000.');
-      return;
-    } else {
-      setError('');
-    }
-
+    e.preventDefault();  
     try {
       const response = await axios.post('http://127.0.0.1:5000/calculate', {
-        numItems,
+        numItems: parseInt(numItems, 10),
         difficulty,
         hasBaseInfo,
       });
@@ -32,11 +25,16 @@ const PricingForm = () => {
       setVerificationTime(response.data.verification_time);
       setCostPerItem(response.data.cost_per_item);
       setPredictedPasses(response.data.predicted_passes);
+      setError('');
     } catch (error) {
-      console.error('Error calculating cost:', error);
+      if (error.response && error.response.data && error.response.data.error) {
+        setError(error.response.data.error);
+      } else {
+        setError('An error occurred while calculating the cost.');
+      }
     }
   };
-  
+
   const formatCurrency = (amount) => {
     return `$${amount.toFixed(2)}`;
   };
