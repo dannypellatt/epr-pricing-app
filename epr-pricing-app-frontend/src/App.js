@@ -94,7 +94,7 @@ const App = () => {
               Here are the assumptions made in the calculations:
             </Typography>
             <ul>
-              <li>The base cost per scrape is determined by predefined ranges from <a target="_blank" href="https://www.clay.com/pricing">Clay</a>.
+              <li>The base cost per scrape is determined by predefined ranges from <a target="_blank" href="https://www.clay.com/pricing" rel="noopener noreferrer">Clay</a>.
                 <ul>
                   <li>0-2000 = $0.0745</li>
                   <li>2000-3000 = $0.0763</li>
