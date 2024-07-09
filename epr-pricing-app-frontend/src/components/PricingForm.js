@@ -53,7 +53,7 @@ const PricingForm = () => {
     }
 
     try {
-      const response = await axios.post('http://127.0.0.1:5000/calculate', {
+      const response = await axios.post('https://epr-pricing-app-backend.onrender.com/calculate', {
         numItems: parseInt(numItems, 10),
         difficulty,
         hasBaseInfo,
