@@ -4,7 +4,7 @@ import math
 import re
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000"])
+CORS(app, origins=["https://main--eprpricing.netlify.app", "http://localhost:3000"])
 
 # Removes unwanted characters
 def sanitize_input(data):
